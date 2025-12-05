@@ -33,17 +33,8 @@ const created = async (req: Request) => {
   return result;
 };
 const update = async (req: Request, id: number) => {
-  const {
-    vehicle_name,
-    type,
-    registration_number,
-    daily_rent_price,
-    availability_status,
-  } = req.body;
+  const { vehicle_name, daily_rent_price, availability_status } = req.body;
 
-  if (!["car", "bike", "van", "SUV"].includes(type)) {
-    throw new Error("Types not found");
-  }
   if (Number(daily_rent_price) < 0) {
     throw new Error("Please provide positive number");
   }
@@ -52,15 +43,11 @@ const update = async (req: Request, id: number) => {
   }
 
   const result = await pool.query(
-    `UPDATE vehicles SET vehicle_name=$1, type=$2, registration_number=$3, daily_rent_price=$4, availability_status=$5 WHERE id=$6 RETURNING id,vehicle_name,type,registration_number, daily_rent_price,availability_status`,
-    [
-      vehicle_name,
-      type,
-      registration_number,
-      daily_rent_price,
-      availability_status,
-      id,
-    ]
+    `UPDATE vehicles SET vehicle_name=$1, daily_rent_price=$2, availability_status=$3 WHERE id=$4 RETURNING id,vehicle_name,type,registration_number, daily_rent_price,availability_status`,
+    [vehicle_name, daily_rent_price, availability_status, id]
+  );
+  result.rows.forEach(
+    (item) => (item.daily_rent_price = Number(item.daily_rent_price))
   );
   return result;
 };

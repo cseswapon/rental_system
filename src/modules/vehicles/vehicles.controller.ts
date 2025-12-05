@@ -20,7 +20,7 @@ const create = async (req: Request, res: Response) => {
 const update = async (req: Request, res: Response) => {
   try {
     const id = Number(req.params.vehicleId);
-    const result = await vehiclesService.update(req, id);
+      const result = await vehiclesService.update(req,id);
     res.status(200).send({
       success: true,
       message: "Vehicle update successfully",
