@@ -51,7 +51,56 @@ const createBooking = async (req: Request) => {
     vehicle,
   };
 };
-const getAllBooking = () => {};
+const getAllBooking = async (req: Request) => {
+  const { user } = req;
+
+  const baseQuery = `
+    SELECT id, customer_id, vehicle_id, rent_start_date, rent_end_date,
+           total_price, status
+    FROM bookings
+  `;
+    
+  const query =
+    user?.role === "admin" ? baseQuery : `${baseQuery} WHERE customer_id=$1`;
+
+  const params = user?.role === "admin" ? [] : [user?.id];
+
+  const result = await pool.query(query, params);
+
+  const getCustomer = async (customerId: number) => {
+    const res = await pool.query(`SELECT name, email FROM users WHERE id=$1`, [
+      customerId,
+    ]);
+    return res.rows[0];
+  };
+
+  const getVehicle = async (vehicleId: number) => {
+    const res = await pool.query(
+      `SELECT vehicle_name, registration_number FROM vehicles WHERE id=$1`,
+      [vehicleId]
+    );
+    return res.rows[0];
+  };
+
+  const bookings = await Promise.all(
+    result.rows.map(async (row) => {
+      const vehicle = await getVehicle(row.vehicle_id);
+
+      const customer =
+        user?.role === "admin" ? await getCustomer(row.customer_id) : undefined;
+
+      return {
+        ...row,
+        ...(customer && { customer }),
+        vehicle,
+      };
+    })
+  );
+
+  return bookings;
+};
+
+
 const updateBooking = () => {};
 export const bookingService = {
   createBooking,
