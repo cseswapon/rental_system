@@ -59,7 +59,7 @@ const getAllBooking = async (req: Request) => {
            total_price, status
     FROM bookings
   `;
-    
+
   const query =
     user?.role === "admin" ? baseQuery : `${baseQuery} WHERE customer_id=$1`;
 
@@ -100,8 +100,53 @@ const getAllBooking = async (req: Request) => {
   return bookings;
 };
 
+const updateBooking = async (req: Request, bookingId: number) => {
+  const { user } = req;
+  const { status } = req.body;
+  if (user?.role === "admin" && status !== "returned") {
+    throw new Error("Status only use 'returned'");
+  }
+  if (user?.role === "customer" && status !== "cancelled") {
+    throw new Error("Status on use 'cancelled'");
+  }
+  const bookingRes = await pool.query(`SELECT * FROM bookings WHERE id=$1`, [
+    bookingId,
+  ]);
+  if (bookingRes.rows.length === 0) throw new Error("Booking not found");
 
-const updateBooking = () => {};
+  const booking = bookingRes.rows[0];
+  if (user?.role === "customer") {
+    const today = new Date();
+    if (today >= new Date(booking.rent_start_date)) {
+      throw new Error("Cannot cancel booking after start date");
+    }
+  }
+
+  const updatedBookingRes = await pool.query(
+    `UPDATE bookings SET status=$1 WHERE id=$2 RETURNING id,customer_id,vehicle_id,rent_start_date,rent_end_date,total_price,status`,
+    [status, bookingId]
+  );
+  let vehicleInfo = null;
+
+  if (user?.role === "admin" && status === "returned") {
+    await pool.query(
+      `UPDATE vehicles SET availability_status='available' WHERE id=$1`,
+      [booking.vehicle_id]
+    );
+
+    const vehicleRes = await pool.query(
+      `SELECT availability_status FROM vehicles WHERE id=$1`,
+      [booking.vehicle_id]
+    );
+    vehicleInfo = vehicleRes.rows[0];
+  }
+
+  return {
+    ...updatedBookingRes.rows[0],
+    ...(vehicleInfo ? { vehicle: vehicleInfo } : {}),
+  };
+};
+
 export const bookingService = {
   createBooking,
   getAllBooking,
