@@ -9,7 +9,7 @@ const createBooking = async (req: Request) => {
     throw new Error("Invalid date ranger");
   }
   const totalDay = getDaysBetweenDates(rent_start_date, rent_end_date);
-  console.log(totalDay, customer_id, vehicle_id);
+  //   console.log(totalDay, customer_id, vehicle_id);
   const vehicleRows = await pool.query(
     `SELECT * FROM vehicles WHERE id=$1 AND availability_status='available'`,
     [vehicle_id]
