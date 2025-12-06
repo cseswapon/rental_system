@@ -19,10 +19,10 @@ const authGuard = (...roles: string[]) => {
       ) as JwtPayload;
       req.user = decode;
       if (roles.length && !roles.includes(decode.role)) {
-        res.status(401).json({
+        res.status(403).json({
           success: false,
-          statusCode: 401,
-          message: "Unauthorized Role Access",
+          statusCode: 403,
+          message: "Forbidden",
         });
         return;
       }

@@ -72,6 +72,9 @@ const getSingle = async (id: number) => {
 };
 const deleteId = async (id: number) => {
   const result = await pool.query(`DELETE FROM vehicles WHERE id=$1`, [id]);
+  if (result.rowCount === 0) {
+    throw new Error("Vehicles not found");
+  }
   result.rows.forEach(
     (item) => (item.daily_rent_price = Number(item.daily_rent_price))
   );
