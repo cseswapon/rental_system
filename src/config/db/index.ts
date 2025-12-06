@@ -41,7 +41,7 @@ const init = async () => {
         rent_start_date DATE NOT NULL,
         rent_end_date DATE NOT NULL,
         total_price NUMERIC CHECK(total_price > 0) NOT NULL,
-        status TEXT CHECK (status IN ('active','cancelled','returned')),
+        status TEXT CHECK (status IN ('active','cancelled','returned')) DEFAULT 'active',
         created_at TIMESTAMP DEFAULT NOW(),
         updated_at TIMESTAMP DEFAULT NOW(),
         CHECK(rent_end_date > rent_start_date)
