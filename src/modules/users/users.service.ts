@@ -19,7 +19,7 @@ const updateUser = async (req: Request, id: number) => {
 };
 const deleteUser = async (id: number) => {
   const booking = await pool.query(
-    `SELECT status FROM bookings WHERE customer_id=$1 AMD status='active' LIMIT 1`,
+    `SELECT status FROM bookings WHERE customer_id=$1 AND status='active' LIMIT 1`,
     [id]
   );
 
