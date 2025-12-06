@@ -2,6 +2,7 @@ import express, { Request, Response, Router } from "express";
 import { authRouter } from "../modules/auth/auth.route";
 import { vehiclesRouter } from "../modules/vehicles/vehicles.route";
 import { userRoute } from "../modules/users/users..route";
+import { bookingRoute} from "../modules/bookings/bookings.route";
 
 const router: Router = express.Router();
 
@@ -23,6 +24,10 @@ const moduleRouter: IRoute[] = [
   {
     path: `${apiVersion}/users`,
     route: userRoute,
+  },
+  {
+    path: `${apiVersion}/bookings`,
+    route: bookingRoute,
   },
 ];
 

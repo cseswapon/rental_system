@@ -11,9 +11,15 @@ const updateUser = async (req: Request, id: number) => {
   if (!["customer", "admin"].includes(role)) {
     throw Error("Role not using customer and admin");
   }
+  let newRole;
+  if (req.user?.role === "customer") {
+    newRole = "customer";
+  } else {
+    newRole = role;
+  }
   const result = await pool.query(
     `UPDATE users SET name=$1, email=$2, phone=$3, role=$4 WHERE id=$5 RETURNING id,name,email,phone,role`,
-    [name, email, phone, role, id]
+    [name, email, phone, newRole, id]
   );
   return result;
 };
