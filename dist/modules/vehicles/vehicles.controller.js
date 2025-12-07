@@ -62,7 +62,9 @@ const getSingle = async (req, res) => {
         const result = await vehicles_service_1.vehiclesService.getSingle(id);
         res.status(200).send({
             success: true,
-            message: "Vehicles retrieved successfully",
+            message: result.rows.length === 0
+                ? "No vehicles found"
+                : "Vehicles retrieved successfully",
             data: result.rows[0],
         });
     }
