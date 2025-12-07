@@ -20,7 +20,7 @@ const create = async (req: Request, res: Response) => {
 const update = async (req: Request, res: Response) => {
   try {
     const id = Number(req.params.vehicleId);
-      const result = await vehiclesService.update(req,id);
+    const result = await vehiclesService.update(req, id);
     res.status(200).send({
       success: true,
       message: "Vehicle update successfully",
@@ -59,7 +59,10 @@ const getSingle = async (req: Request, res: Response) => {
     const result = await vehiclesService.getSingle(id);
     res.status(200).send({
       success: true,
-      message: "Vehicles retrieved successfully",
+      message:
+        result.rows.length === 0
+          ? "No vehicles found"
+          : "Vehicles retrieved successfully",
       data: result.rows[0],
     });
   } catch (error: any) {
